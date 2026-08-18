@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Party Time Fun | Book Now</title><meta name="description" content="Party Time Fun event entertainment in Central Texas."><link rel="stylesheet" href="styles.css"></head><body>
+<header class="top"><nav class="nav">
+<a href="index.html"><img class="logo" src="assets/logo.jpg" alt="Party Time Fun logo"></a>
+<div class="links">
+<a class="" href="index.html">HOME</a>
+<a class="" href="services.html">SERVICES</a>
+<a class="" href="gallery.html">GALLERY</a>
+<a class="" href="about.html">ABOUT US</a>
+<a class="active" href="book.html">BOOK NOW</a>
+<a class="" href="contact.html">CONTACT</a>
+<a class="book-pill" href="book.html">REQUEST AVAILABILITY</a>
+</div></nav></header>
+
+<section class="hero"><div class="hero-inner"><div><div class="eyebrow">Book Party Time Fun</div><h2 style="font-size:clamp(52px,7vw,88px);line-height:.94;margin:12px 0 20px">Let’s Make Your Event <span style="color:#ff74ba">Amazing!</span></h2><p>Tell us about your event and the services you’re interested in. We’ll review your request and follow up with availability and next steps.</p></div><div class="hero-photo"><img src="assets/face-feature.jpg" alt="Party Time Fun face painting"></div></div></section>
+<main class="form-layout">
+<aside class="info-panel"><h2>Party Time Fun</h2><p>Creative entertainment for private and commercial events throughout Central Texas.</p>
+<div class="row"><strong>Call or Text</strong><a href="tel:+15123644730">(512) 364-4730</a></div>
+<div class="row"><strong>Email</strong><a href="mailto:contactpartytimefun@gmail.com">contactpartytimefun@gmail.com</a></div>
+<div class="row"><strong>Service Area</strong>Austin • Temple • Killeen • Waco • Surrounding Central Texas</div>
+<div class="row"><strong>Important</strong>Submitting this form is an availability request, not a confirmed booking.</div></aside>
+<section class="form-card"><h1>Request Availability</h1><p>Required fields are marked with an asterisk. Email is optional.</p>
+<form action="https://formsubmit.co/contactpartytimefun@gmail.com" method="POST" id="booking-form">
+<input type="hidden" name="_subject" value="New Party Time Fun Booking Request"><input type="hidden" name="_template" value="table"><input type="hidden" name="_captcha" value="false"><input type="text" name="_honey" style="display:none">
+<div class="form-grid">
+<div class="field"><label for="full-name">Full Name *</label><input id="full-name" name="Full Name" required autocomplete="name"></div>
+<div class="field"><label for="email">Email Address</label><input id="email" type="email" name="Email" autocomplete="email"></div>
+<div class="field"><label for="phone">Phone Number *</label><input id="phone" type="tel" name="Phone" required autocomplete="tel"></div>
+<div class="field"><label for="event-date">Event Date *</label><input id="event-date" type="date" name="Event Date" required></div>
+<div class="field"><label for="event-type">Event Type *</label><select id="event-type" name="Event Type" required><option value="">Select event type</option><option>Birthday Party</option><option>School Event</option><option>Corporate Event</option><option>Festival</option><option>Church Event</option><option>Community Event</option><option>Grand Opening</option><option>Fundraiser</option><option>Private Celebration</option><option>Other</option></select></div>
+<div class="field"><label for="event-location">Event Location *</label><input id="event-location" name="Event Location" placeholder="City, venue, or address" required autocomplete="street-address"></div>
+<div class="field"><label for="guest-count">Approximate Guest Count *</label><select id="guest-count" name="Guest Count" required><option value="">Select guest count</option><option>Under 25</option><option>25–50</option><option>51–100</option><option>101–200</option><option>201–500</option><option>500+</option></select></div>
+<div class="field"><label for="event-time">Event Time / Hours Needed</label><input id="event-time" name="Event Time / Hours Needed" placeholder="Example: 2:00–5:00 PM"></div>
+<div class="field full"><label>Requested Services *</label><div class="checks">
+<label for="svc-face"><input id="svc-face" class="service-check" type="checkbox" name="Requested Services" value="Face Painting"> Face Painting</label><label for="svc-balloon"><input id="svc-balloon" class="service-check" type="checkbox" name="Requested Services" value="Balloon Twisting"> Balloon Twisting</label><label for="svc-glitter-bar"><input id="svc-glitter-bar" class="service-check" type="checkbox" name="Requested Services" value="Glitter Bar"> Glitter Bar</label><label for="svc-glitter-tattoos"><input id="svc-glitter-tattoos" class="service-check" type="checkbox" name="Requested Services" value="Glitter Tattoos"> Glitter Tattoos</label><label for="svc-temporary"><input id="svc-temporary" class="service-check" type="checkbox" name="Requested Services" value="Temporary Tattoo Designs"> Temporary Tattoo Designs</label></div><div id="service-error" style="display:none;color:#a51f55;font-weight:800;margin-top:10px">Please select at least one service.</div></div>
+<div class="field full"><label for="details">Additional Details / Notes</label><textarea id="details" name="Additional Details" placeholder="Theme, age group, venue, special requests, etc."></textarea></div>
+<div class="field full"><button class="submit" type="submit">REQUEST AVAILABILITY</button></div>
+</div></form></section></main>
+<footer><p><strong>Party Time Fun</strong> • Austin • Temple • Killeen • Waco • Surrounding Central Texas</p>
+<p><a href="tel:+15123644730">(512) 364-4730</a> • <a href="mailto:contactpartytimefun@gmail.com">contactpartytimefun@gmail.com</a></p>
+<p><a href="https://facebook.com/partytimefunn" target="_blank" rel="noopener">Facebook: partytimefunn</a> &nbsp; • &nbsp; <a href="https://instagram.com/estherfacepainting" target="_blank" rel="noopener">Instagram: @estherfacepainting</a></p></footer><script>
+document.getElementById('booking-form').addEventListener('submit', function(e){
+  const checks=[...document.querySelectorAll('.service-check')];
+  const ok=checks.some(c=>c.checked);
+  const msg=document.getElementById('service-error');
+  if(!ok){e.preventDefault();msg.style.display='block';checks[0].focus();}
+  else{msg.style.display='none';}
+});
+document.querySelectorAll('.service-check').forEach(c=>c.addEventListener('change',()=>{
+  if([...document.querySelectorAll('.service-check')].some(x=>x.checked))
+    document.getElementById('service-error').style.display='none';
+}));
+</script></body></html>
