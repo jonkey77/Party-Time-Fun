@@ -1,4 +1,4 @@
-name: Convert JPEG site images to PNG
+name: Prepare homepage PNG images
 
 on:
   workflow_dispatch:
@@ -10,8 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  convert:
-    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message != 'Convert site JPEG images to PNG'
+  prepare:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,62 +21,79 @@ jobs:
           python-version: '3.12'
       - name: Install Pillow
         run: python -m pip install --disable-pip-version-check pillow
-      - name: Convert JPEG assets and update pages
+      - name: Convert homepage JPEGs and make transparent logo
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           from PIL import Image
+          from collections import deque
+          import numpy as np
 
           root = Path('.')
-          assets = root / 'assets'
-          jpgs = sorted([*assets.glob('*.jpg'), *assets.glob('*.jpeg'), *assets.glob('*.JPG'), *assets.glob('*.JPEG')])
+          feature_names = [
+              'face-feature.JPG',
+              'balloon-feature.jpg',
+              'glitter-feature.JPG',
+              'glittertat-feature.JPG',
+              'temp-rose.jpg',
+          ]
+
           replacements = {}
-
-          for src in jpgs:
-              dst = src.with_suffix('.png')
+          for name in feature_names:
+              src = root / name
+              if not src.exists():
+                  continue
+              dst = root / (src.stem + '.png')
               with Image.open(src) as im:
-                  if im.mode in ('RGBA', 'LA'):
-                      out = im.convert('RGBA')
-                  else:
-                      out = im.convert('RGB')
-                  out.save(dst, 'PNG', optimize=True)
-              replacements[f'assets/{src.name}'] = f'assets/{dst.name}'
+                  im = im.convert('RGB')
+                  im.save(dst, 'PNG', optimize=True)
+              replacements[f'./{name}'] = f'./{dst.name}'
 
-          for page in root.glob('*.html'):
-              text = page.read_text(encoding='utf-8')
+          logo = root / 'logo.png'
+          if logo.exists():
+              with Image.open(logo) as im:
+                  rgba = im.convert('RGBA')
+                  arr = np.array(rgba)
+                  rgb = arr[:, :, :3]
+                  h, w = rgb.shape[:2]
+                  # Only remove near-white pixels connected to the image edges,
+                  # preserving white details inside the artwork.
+                  white = (rgb[:, :, 0] > 238) & (rgb[:, :, 1] > 238) & (rgb[:, :, 2] > 238)
+                  seen = np.zeros((h, w), dtype=bool)
+                  q = deque()
+                  for x in range(w):
+                      if white[0, x]: q.append((0, x))
+                      if white[h-1, x]: q.append((h-1, x))
+                  for y in range(h):
+                      if white[y, 0]: q.append((y, 0))
+                      if white[y, w-1]: q.append((y, w-1))
+                  while q:
+                      y, x = q.popleft()
+                      if y < 0 or y >= h or x < 0 or x >= w or seen[y, x] or not white[y, x]:
+                          continue
+                      seen[y, x] = True
+                      q.extend(((y-1,x),(y+1,x),(y,x-1),(y,x+1)))
+                  arr[seen, 3] = 0
+                  Image.fromarray(arr, 'RGBA').save(root / 'logo-transparent.png', 'PNG', optimize=True)
+
+          index = root / 'index.html'
+          if index.exists():
+              text = index.read_text(encoding='utf-8')
+              text = text.replace('./logo.png', './logo-transparent.png')
               for old, new in replacements.items():
                   text = text.replace(old, new)
-              page.write_text(text, encoding='utf-8')
-
-          for src in jpgs:
-              src.unlink()
+              index.write_text(text, encoding='utf-8')
           PY
-      - name: Use transparent logo PNG on all pages
-        shell: bash
-        run: |
-          if [ -f assets/logo-transparent.webp ]; then
-            python - <<'PY'
-          from pathlib import Path
-          from PIL import Image
-          src = Path('assets/logo-transparent.webp')
-          dst = Path('assets/logo.png')
-          with Image.open(src) as im:
-              im.convert('RGBA').save(dst, 'PNG', optimize=True)
-          for page in Path('.').glob('*.html'):
-              text = page.read_text(encoding='utf-8').replace('assets/logo-transparent.webp','assets/logo.png')
-              page.write_text(text, encoding='utf-8')
-          PY
-          fi
-      - name: Commit converted PNG files
+      - name: Commit prepared homepage images
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
+          git add index.html logo-transparent.png *-feature.png temp-rose.png || true
           if git diff --cached --quiet; then
-            echo 'No JPEG files needed conversion.'
+            echo 'No homepage image changes were needed.'
           else
-            git commit -m 'Convert site JPEG images to PNG'
+            git commit -m 'Prepare transparent logo and PNG homepage images'
             git push origin HEAD:main
           fi
