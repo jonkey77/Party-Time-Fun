@@ -29,6 +29,7 @@ jobs:
           from PIL import Image, ImageFile
           from collections import deque
           import numpy as np
+          import re
 
           ImageFile.LOAD_TRUNCATED_IMAGES = True
           root = Path('.')
@@ -43,7 +44,6 @@ jobs:
               'temp-rose.jpg','temp-tribal.jpg','temp-seahorse.jpg'
           ]
 
-          made = {}
           for name in image_names:
               src = root / name
               if not src.exists():
@@ -51,43 +51,47 @@ jobs:
               dst = assets / (src.stem + '.png')
               with Image.open(src) as im:
                   im.load()
-                  if im.mode in ('RGBA','LA'):
-                      out = im.convert('RGBA')
-                  else:
-                      out = im.convert('RGB')
+                  out = im.convert('RGBA') if im.mode in ('RGBA','LA') else im.convert('RGB')
                   out.save(dst, 'PNG', optimize=True)
-              made[name] = dst.as_posix()
 
+          # Build a new transparent logo using edge-connected light neutral pixels.
+          # This removes white/off-white background while preserving white details
+          # enclosed inside the colored logo artwork.
           logo_src = root / 'logo.png'
-          logo_dst = assets / 'logo-transparent.png'
+          logo_dst = assets / 'logo-transparent-v2.png'
           if logo_src.exists():
               with Image.open(logo_src) as im:
-                  rgba = im.convert('RGBA')
-                  arr = np.array(rgba)
-                  rgb = arr[:, :, :3]
+                  arr = np.array(im.convert('RGBA'))
+                  rgb = arr[:, :, :3].astype(np.int16)
                   h, w = rgb.shape[:2]
-                  white = (rgb[:,:,0] > 238) & (rgb[:,:,1] > 238) & (rgb[:,:,2] > 238)
-                  seen = np.zeros((h,w), dtype=bool)
+                  hi = rgb.max(axis=2)
+                  lo = rgb.min(axis=2)
+                  brightness = rgb.mean(axis=2)
+                  chroma = hi - lo
+                  candidate = (brightness > 178) & (chroma < 68)
+                  seen = np.zeros((h, w), dtype=bool)
                   q = deque()
                   for x in range(w):
-                      if white[0,x]: q.append((0,x))
-                      if white[h-1,x]: q.append((h-1,x))
+                      if candidate[0, x]: q.append((0, x))
+                      if candidate[h-1, x]: q.append((h-1, x))
                   for y in range(h):
-                      if white[y,0]: q.append((y,0))
-                      if white[y,w-1]: q.append((y,w-1))
+                      if candidate[y, 0]: q.append((y, 0))
+                      if candidate[y, w-1]: q.append((y, w-1))
                   while q:
-                      y,x = q.popleft()
-                      if y < 0 or y >= h or x < 0 or x >= w or seen[y,x] or not white[y,x]:
+                      y, x = q.popleft()
+                      if y < 0 or y >= h or x < 0 or x >= w or seen[y, x] or not candidate[y, x]:
                           continue
-                      seen[y,x] = True
+                      seen[y, x] = True
                       q.extend(((y-1,x),(y+1,x),(y,x-1),(y,x+1)))
-                  arr[seen,3] = 0
-                  Image.fromarray(arr,'RGBA').save(logo_dst,'PNG',optimize=True)
+                  arr[seen, 3] = 0
+                  Image.fromarray(arr, 'RGBA').save(logo_dst, 'PNG', optimize=True)
 
           page_files = ['services.html','gallery.html','about.html','book.html','contact.html']
           basic = {
-              'assets/logo.jpg':'assets/logo-transparent.png',
-              './assets/logo.jpg':'./assets/logo-transparent.png',
+              'assets/logo.jpg':'assets/logo-transparent-v2.png',
+              './assets/logo.jpg':'./assets/logo-transparent-v2.png',
+              'assets/logo-transparent.png':'assets/logo-transparent-v2.png',
+              './assets/logo-transparent.png':'./assets/logo-transparent-v2.png',
               'assets/face-feature.jpg':'assets/face-feature.png',
               'assets/balloon-feature.jpg':'assets/balloon-feature.png',
               'assets/glitter-feature.jpg':'assets/glitter-feature.png',
@@ -101,16 +105,16 @@ jobs:
           }
           for page_name in page_files:
               p = root / page_name
-              if not p.exists(): continue
+              if not p.exists():
+                  continue
               text = p.read_text(encoding='utf-8')
-              for old,new in basic.items(): text = text.replace(old,new)
-              p.write_text(text,encoding='utf-8')
+              for old, new in basic.items():
+                  text = text.replace(old, new)
+              p.write_text(text, encoding='utf-8')
 
-          # Replace Gallery sprite-based tiles with individual PNG images.
           gp = root / 'gallery.html'
           if gp.exists():
               text = gp.read_text(encoding='utf-8')
-              import re
               groups = {
                   'face-sprite.webp':['face-feature.png','face-gallery1.png','face-gallery2.png','face-gallery3.png','face-gallery4.png','face-gallery5.png'],
                   'balloon-sprite.webp':['balloon-feature.png','balloon1.png','balloon2.png','balloon3.png','balloon4.png'],
@@ -121,23 +125,13 @@ jobs:
               for sprite, files in groups.items():
                   pattern = re.compile(r'<div class="sprite[^>]*"[^>]*style="[^"]*background-image:\s*url\([^)]*'+re.escape(sprite)+r'[^)]*\)[^"]*"[^>]*></div>')
                   matches = list(pattern.finditer(text))
-                  for i,m in reversed(list(enumerate(matches))):
+                  for i, m in reversed(list(enumerate(matches))):
                       if i < len(files):
                           repl = '<img class="gallery-png" src="./assets/'+files[i]+'" alt="Party Time Fun gallery photo" loading="lazy">'
                           text = text[:m.start()] + repl + text[m.end():]
-              # Fallback for sprite elements using CSS classes/background positions: replace sequential occurrences containing each sprite.
-              for sprite, files in groups.items():
-                  idx = 0
-                  def repl(m):
-                      nonlocal_idx = None
-                      return m.group(0)
-                  # Directly replace img src references if any remain.
-                  text = text.replace('./assets/'+sprite, './assets/'+files[0])
-                  text = text.replace('assets/'+sprite, 'assets/'+files[0])
-              # Ensure direct PNG gallery images size consistently.
               if '</head>' in text and '.gallery-png{' not in text:
                   text = text.replace('</head>','<style>.gallery-png{display:block;width:100%;height:260px;object-fit:cover;object-position:center;border-radius:18px}@media(max-width:700px){.gallery-png{height:210px}}</style></head>')
-              gp.write_text(text,encoding='utf-8')
+              gp.write_text(text, encoding='utf-8')
           PY
       - name: Commit all PNG images and page updates
         shell: bash
@@ -148,6 +142,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No site PNG changes were needed.'
           else
-            git commit -m 'Convert site photos to PNG and update five pages'
+            git commit -m 'Regenerate transparent header logo and refresh page references'
             git push origin HEAD:main
           fi
