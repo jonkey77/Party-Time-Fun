@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Party Time Fun | Book Now</title><meta name="description" content="Party Time Fun event entertainment in Central Texas.">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action https://formsubmit.co; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action https://formspree.io; connect-src https://formspree.io; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <link rel="stylesheet" href="styles.css"></head><body>
 <header class="top"><nav class="nav">
 <a href="index.html"><img class="logo" src="assets/logo-transparent-v2.png" alt="Party Time Fun logo"></a>
@@ -23,12 +23,9 @@
 <div class="row"><strong>Service Area</strong>Austin • Temple • Killeen • Waco • Surrounding Central Texas</div>
 <div class="row"><strong>Important</strong>Submitting this form is an availability request, not a confirmed booking.</div></aside>
 <section class="form-card"><h1>Request Availability</h1><p>Required fields are marked with an asterisk. Email is optional.</p>
-<form action="https://formsubmit.co/contactpartytimefun@gmail.com" method="POST" id="booking-form">
+<form action="https://formspree.io/f/mbgrqolg" method="POST" id="booking-form">
 <input type="hidden" name="_subject" value="New Party Time Fun Booking Request">
-<input type="hidden" name="_template" value="table">
-<input type="hidden" name="_captcha" value="true">
-<input type="hidden" name="_next" value="https://jonkey77.github.io/Party-Time-Fun/thanks.html">
-<input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
 <div class="form-grid">
 <div class="field"><label for="full-name">Full Name *</label><input id="full-name" name="Full Name" required maxlength="100" autocomplete="name"></div>
 <div class="field"><label for="email">Email Address</label><input id="email" type="email" name="Email" maxlength="254" autocomplete="email"></div>
@@ -43,7 +40,7 @@
 <label for="svc-face"><input id="svc-face" class="service-check" type="checkbox" name="Requested Services" value="Face Painting"> Face Painting</label><label for="svc-balloon"><input id="svc-balloon" class="service-check" type="checkbox" name="Requested Services" value="Balloon Twisting"> Balloon Twisting</label><label for="svc-glitter-bar"><input id="svc-glitter-bar" class="service-check" type="checkbox" name="Requested Services" value="Glitter Bar"> Glitter Bar</label><label for="svc-glitter-tattoos"><input id="svc-glitter-tattoos" class="service-check" type="checkbox" name="Requested Services" value="Glitter Tattoos"> Glitter Tattoos</label><label for="svc-temporary"><input id="svc-temporary" class="service-check" type="checkbox" name="Requested Services" value="Temporary Tattoo Designs"> Temporary Tattoo Designs</label></div><div id="service-error" style="display:none;color:#a51f55;font-weight:800;margin-top:10px">Please select at least one service.</div></div>
 <div class="field full"><label for="details">Additional Details / Notes</label><textarea id="details" name="Additional Details" maxlength="2000" placeholder="Theme, age group, venue, special requests, etc."></textarea><small style="margin-top:6px;color:#6b4a78">Please do not enter credit-card numbers, Social Security numbers, or other sensitive information.</small></div>
 <div class="field full"><label for="consent" style="display:flex;align-items:flex-start;gap:10px;font-weight:700"><input id="consent" type="checkbox" name="Consent to Contact" value="Yes" required style="width:auto;margin-top:4px"> I agree that Party Time Fun may contact me about this event request. *</label></div>
-<div class="field full"><button class="submit" type="submit">REQUEST AVAILABILITY</button></div>
+<div class="field full"><button class="submit" type="submit">REQUEST AVAILABILITY</button><div id="form-status" role="status" aria-live="polite" style="margin-top:12px;font-weight:800"></div></div>
 </div></form></section></main>
 <footer><p><strong>Party Time Fun</strong> • Austin • Temple • Killeen • Waco • Surrounding Central Texas</p>
 <p><a href="tel:+15123644730">(512) 364-4730</a> • <a href="mailto:contactpartytimefun@gmail.com">contactpartytimefun@gmail.com</a></p>
@@ -77,11 +74,27 @@ if(requestedPackage && packageSlugs[requestedPackage]){
   applyPackage(packageSelect.value);
   packageSelect.scrollIntoView({behavior:'smooth',block:'center'});
 }
-document.getElementById('booking-form').addEventListener('submit', function(e){
+document.getElementById('booking-form').addEventListener('submit', async function(e){
+  e.preventDefault();
   const ok=checks.some(c=>c.checked);
   const msg=document.getElementById('service-error');
-  if(!ok){e.preventDefault();msg.style.display='block';checks[0].focus();}
-  else{msg.style.display='none';}
+  const status=document.getElementById('form-status');
+  const button=this.querySelector('button[type="submit"]');
+  if(!ok){msg.style.display='block';checks[0].focus();return;}
+  msg.style.display='none';
+  status.style.color='#4e1979';
+  status.textContent='Sending your request…';
+  button.disabled=true;
+  try{
+    const response=await fetch(this.action,{method:'POST',body:new FormData(this),headers:{Accept:'application/json'}});
+    if(response.ok){window.location.href='thanks.html';return;}
+    const data=await response.json().catch(()=>({}));
+    throw new Error(data.errors?.map(x=>x.message).join(', ')||'Unable to send your request.');
+  }catch(error){
+    status.style.color='#a51f55';
+    status.textContent=error.message||'Unable to send your request. Please call or text (512) 364-4730.';
+    button.disabled=false;
+  }
 });
 checks.forEach(c=>c.addEventListener('change',()=>{
   if(checks.some(x=>x.checked)) document.getElementById('service-error').style.display='none';
