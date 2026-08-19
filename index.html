@@ -33,57 +33,29 @@ body.home-theme{background:#fff8fd}
 .hero-photo img{display:block;position:relative;z-index:2;width:100%;max-width:390px;height:430px;object-fit:cover;object-position:center 24%;border-radius:46% 46% 28px 28px;border:7px solid rgba(255,255,255,.92);box-shadow:0 22px 45px rgba(30,5,65,.3)}
 .service-ribbon{background:linear-gradient(180deg,#fff 0%,#fff7fd 100%);padding:38px 22px 48px;border-top:8px solid #ff1797}
 .service-showcase{max-width:1220px;margin:auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
-.service-bubble{text-align:center;min-width:0}
-.service-bubble a{display:block}
+.service-bubble{text-align:center;min-width:0}.service-bubble a{display:block}
 .bubble-img{width:clamp(120px,14vw,170px);aspect-ratio:1;margin:auto;border-radius:50%;padding:6px;background:white;box-shadow:0 12px 28px rgba(67,17,102,.16)}
 .service-bubble:nth-child(1) .bubble-img{border:6px solid #ff1797}.service-bubble:nth-child(2) .bubble-img{border:6px solid #10bdc7}.service-bubble:nth-child(3) .bubble-img{border:6px solid #7e27b5}.service-bubble:nth-child(4) .bubble-img{border:6px solid #f5b800}.service-bubble:nth-child(5) .bubble-img{border:6px solid #ff1797}
 .bubble-img img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .service-bubble h3{display:inline-block;color:white;margin:-12px auto 0;padding:10px 16px;border-radius:999px;font-size:17px;position:relative}
 .service-bubble:nth-child(1) h3{background:#ff1797}.service-bubble:nth-child(2) h3{background:#0cb4bd}.service-bubble:nth-child(3) h3{background:#7c27b3}.service-bubble:nth-child(4) h3{background:#f2ad00}.service-bubble:nth-child(5) h3{background:#ff1797}
 .celebrate{text-align:center;padding:6px 20px 50px;background:linear-gradient(180deg,#fff7fd,#fff)}
-.celebrate h2{font-size:clamp(40px,5.5vw,72px);margin:0;color:#4f1686}
-.celebrate h2 .gold{color:#f6b700}.celebrate h2 .teal{color:#09aeb9}
+.celebrate h2{font-size:clamp(40px,5.5vw,72px);margin:0;color:#4f1686}.celebrate h2 .gold{color:#f6b700}.celebrate h2 .teal{color:#09aeb9}
 .celebrate p{font-weight:900;letter-spacing:.14em;color:#5d2a84}
 .home-cta{max-width:1100px;margin:0 auto 64px;border-radius:34px;padding:42px 28px;text-align:center;color:white;background:linear-gradient(115deg,#50138b,#8e2ac0 48%,#13aeb9);box-shadow:0 16px 40px rgba(67,17,102,.16)}
 .home-cta h2{font-size:clamp(36px,5vw,58px);margin:0 0 12px}.home-cta p{font-size:18px;margin:0 auto 24px;max-width:720px}
-@media(max-width:1050px){
- .home-theme .nav{flex-wrap:wrap;justify-content:center;padding:10px 18px}
- .home-theme .links{width:100%;justify-content:center;flex-wrap:wrap;gap:8px 16px}
- .color-inner{grid-template-columns:1fr 1.2fr}
- .hero-photo{grid-column:1/-1}
- .hero-photo img{height:340px;max-width:520px;border-radius:28px}
- .service-showcase{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:700px){
- .home-theme .logo{width:130px;max-height:62px}
- .home-theme .links a{font-size:12px}
- .home-theme .links .book-pill{padding:8px 11px}
- .color-inner{grid-template-columns:1fr;padding:28px 16px 38px}
- .hero-logo-card img{width:280px}
- .hero-copy h1{font-size:clamp(42px,13vw,62px)}
- .hero-copy p{font-size:17px}
- .hero-copy .central{font-size:25px}
- .hero-photo{grid-column:auto}
- .hero-photo img{height:290px;width:100%;border-radius:24px}
- .service-showcase{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 10px}
- .service-bubble:last-child{grid-column:1/-1}
- .bubble-img{width:138px}
- .service-bubble h3{font-size:14px;padding:9px 12px}
- .service-line{font-size:10px;letter-spacing:.05em}
- .celebrate h2{font-size:42px}
- .celebrate p{font-size:12px;line-height:1.8}
- .home-cta{margin:0 14px 44px}
-}
+@media(max-width:1050px){.home-theme .nav{flex-wrap:wrap;justify-content:center;padding:10px 18px}.home-theme .links{width:100%;justify-content:center;flex-wrap:wrap;gap:8px 16px}.color-inner{grid-template-columns:1fr 1.2fr}.hero-photo{grid-column:1/-1}.hero-photo img{height:340px;max-width:520px;border-radius:28px}.service-showcase{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.home-theme .logo{width:110px;max-height:62px}.home-theme .links a{font-size:12px}.home-theme .links .book-pill{padding:8px 11px}.color-inner{grid-template-columns:1fr;padding:28px 16px 38px}.hero-logo-card img{width:280px}.hero-copy h1{font-size:clamp(42px,13vw,62px)}.hero-copy p{font-size:17px}.hero-copy .central{font-size:25px}.hero-photo{grid-column:auto}.hero-photo img{height:290px;width:100%;border-radius:24px}.service-showcase{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 10px}.service-bubble:last-child{grid-column:1/-1}.bubble-img{width:138px}.service-bubble h3{font-size:14px;padding:9px 12px}.service-line{font-size:10px;letter-spacing:.05em}.celebrate h2{font-size:42px}.celebrate p{font-size:12px;line-height:1.8}.home-cta{margin:0 14px 44px}}
 </style>
 </head>
 <body class="home-theme">
 <header class="top"><nav class="nav">
-<a href="./index.html"><img class="logo" src="./assets/logo-transparent.webp" alt="Party Time Fun logo"></a>
+<a href="./index.html"><img class="logo" src="./assets/logo.png" alt="Party Time Fun logo"></a>
 <div class="links"><a class="active" href="./index.html">HOME</a><a href="./services.html">SERVICES</a><a href="./gallery.html">GALLERY</a><a href="./about.html">ABOUT US</a><a href="./book.html">BOOK NOW</a><a href="./contact.html">CONTACT</a><a class="book-pill" href="./book.html">BOOK NOW</a></div>
 </nav></header>
 <main>
 <section class="color-hero"><div class="color-inner">
-<div class="hero-logo-card"><img src="./assets/logo-transparent.webp" alt="Party Time Fun Face Painting logo"></div>
+<div class="hero-logo-card"><img src="./assets/logo.png" alt="Party Time Fun Face Painting logo"></div>
 <div class="hero-copy"><div class="service-line">FACE PAINTING <span>●</span> BALLOON TWISTING <span>●</span> GLITTER BAR</div><h1>Making Every<br>Event More <strong>Colorful!</strong></h1><p>Bringing smiles, sparkle and creativity to parties and events across</p><div class="central">Central Texas!</div><div class="hero-actions"><a class="btn btn-primary" href="./book.html">BOOK NOW</a><a class="btn btn-secondary" href="./gallery.html">VIEW GALLERY</a></div></div>
 <div class="hero-photo"><img src="./assets/face-feature.jpg" alt="Colorful Party Time Fun face painting"></div>
 </div></section>
