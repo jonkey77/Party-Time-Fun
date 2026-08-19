@@ -30,6 +30,7 @@
 <div class="field"><label for="event-location">Event Location *</label><input id="event-location" name="Event Location" placeholder="City, venue, or address" required autocomplete="street-address"></div>
 <div class="field"><label for="guest-count">Approximate Guest Count *</label><select id="guest-count" name="Guest Count" required><option value="">Select guest count</option><option>Under 25</option><option>25–50</option><option>51–100</option><option>101–200</option><option>201–500</option><option>500+</option></select></div>
 <div class="field"><label for="event-time">Event Time / Hours Needed</label><input id="event-time" name="Event Time / Hours Needed" placeholder="Example: 2:00–5:00 PM"></div>
+<div class="field full"><label for="package-deal">Package Deal / Booking Type *</label><select id="package-deal" name="Package Deal / Booking Type" required><option value="">Choose a package or build your own</option><option value="Build My Own / Individual Services">Build My Own / Individual Services</option><option value="Color & Fun Package">Color &amp; Fun Package — Face Painting + Balloon Twisting</option><option value="Sparkle Package">Sparkle Package — Glitter Bar + Glitter Tattoos</option><option value="Party Favorites Package">Party Favorites Package — Face Painting + Balloon Twisting + Glitter Tattoos</option><option value="Deluxe Party Package">Deluxe Party Package — Face Painting + Balloon Twisting + Glitter Bar + Glitter Tattoos</option><option value="Ultimate Party Time Fun Package">Ultimate Party Time Fun Package — All Five Services</option></select><small style="margin-top:6px;color:#6b4a78;line-height:1.45">Selecting a package will automatically check the included services below. You can still adjust the service selections if needed.</small></div>
 <div class="field full"><label>Requested Services *</label><div class="checks">
 <label for="svc-face"><input id="svc-face" class="service-check" type="checkbox" name="Requested Services" value="Face Painting"> Face Painting</label><label for="svc-balloon"><input id="svc-balloon" class="service-check" type="checkbox" name="Requested Services" value="Balloon Twisting"> Balloon Twisting</label><label for="svc-glitter-bar"><input id="svc-glitter-bar" class="service-check" type="checkbox" name="Requested Services" value="Glitter Bar"> Glitter Bar</label><label for="svc-glitter-tattoos"><input id="svc-glitter-tattoos" class="service-check" type="checkbox" name="Requested Services" value="Glitter Tattoos"> Glitter Tattoos</label><label for="svc-temporary"><input id="svc-temporary" class="service-check" type="checkbox" name="Requested Services" value="Temporary Tattoo Designs"> Temporary Tattoo Designs</label></div><div id="service-error" style="display:none;color:#a51f55;font-weight:800;margin-top:10px">Please select at least one service.</div></div>
 <div class="field full"><label for="details">Additional Details / Notes</label><textarea id="details" name="Additional Details" placeholder="Theme, age group, venue, special requests, etc."></textarea></div>
@@ -38,15 +39,42 @@
 <footer><p><strong>Party Time Fun</strong> • Austin • Temple • Killeen • Waco • Surrounding Central Texas</p>
 <p><a href="tel:+15123644730">(512) 364-4730</a> • <a href="mailto:contactpartytimefun@gmail.com">contactpartytimefun@gmail.com</a></p>
 <p><a href="https://facebook.com/partytimefunn" target="_blank" rel="noopener">Facebook: partytimefunn</a> &nbsp; • &nbsp; <a href="https://instagram.com/estherfacepainting" target="_blank" rel="noopener">Instagram: @estherfacepainting</a></p></footer><script>
+const packageMap={
+  'Color & Fun Package':['Face Painting','Balloon Twisting'],
+  'Sparkle Package':['Glitter Bar','Glitter Tattoos'],
+  'Party Favorites Package':['Face Painting','Balloon Twisting','Glitter Tattoos'],
+  'Deluxe Party Package':['Face Painting','Balloon Twisting','Glitter Bar','Glitter Tattoos'],
+  'Ultimate Party Time Fun Package':['Face Painting','Balloon Twisting','Glitter Bar','Glitter Tattoos','Temporary Tattoo Designs']
+};
+const packageSlugs={
+  'color-fun':'Color & Fun Package',
+  'sparkle':'Sparkle Package',
+  'party-favorites':'Party Favorites Package',
+  'deluxe':'Deluxe Party Package',
+  'ultimate':'Ultimate Party Time Fun Package'
+};
+const packageSelect=document.getElementById('package-deal');
+const checks=[...document.querySelectorAll('.service-check')];
+function applyPackage(name){
+  if(!packageMap[name]) return;
+  const included=new Set(packageMap[name]);
+  checks.forEach(c=>c.checked=included.has(c.value));
+  document.getElementById('service-error').style.display='none';
+}
+packageSelect.addEventListener('change',()=>applyPackage(packageSelect.value));
+const requestedPackage=new URLSearchParams(window.location.search).get('package');
+if(requestedPackage && packageSlugs[requestedPackage]){
+  packageSelect.value=packageSlugs[requestedPackage];
+  applyPackage(packageSelect.value);
+  packageSelect.scrollIntoView({behavior:'smooth',block:'center'});
+}
 document.getElementById('booking-form').addEventListener('submit', function(e){
-  const checks=[...document.querySelectorAll('.service-check')];
   const ok=checks.some(c=>c.checked);
   const msg=document.getElementById('service-error');
   if(!ok){e.preventDefault();msg.style.display='block';checks[0].focus();}
   else{msg.style.display='none';}
 });
-document.querySelectorAll('.service-check').forEach(c=>c.addEventListener('change',()=>{
-  if([...document.querySelectorAll('.service-check')].some(x=>x.checked))
-    document.getElementById('service-error').style.display='none';
+checks.forEach(c=>c.addEventListener('change',()=>{
+  if(checks.some(x=>x.checked)) document.getElementById('service-error').style.display='none';
 }));
 </script></body></html>
