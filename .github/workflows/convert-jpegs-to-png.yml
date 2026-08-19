@@ -19,8 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install Pillow
-        run: python -m pip install --disable-pip-version-check pillow
+      - name: Install image dependencies
+        run: python -m pip install --disable-pip-version-check pillow numpy
       - name: Convert homepage JPEGs and make transparent logo
         shell: bash
         run: |
@@ -57,8 +57,6 @@ jobs:
                   arr = np.array(rgba)
                   rgb = arr[:, :, :3]
                   h, w = rgb.shape[:2]
-                  # Only remove near-white pixels connected to the image edges,
-                  # preserving white details inside the artwork.
                   white = (rgb[:, :, 0] > 238) & (rgb[:, :, 1] > 238) & (rgb[:, :, 2] > 238)
                   seen = np.zeros((h, w), dtype=bool)
                   q = deque()
