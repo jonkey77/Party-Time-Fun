@@ -26,9 +26,11 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          from PIL import Image
+          from PIL import Image, ImageFile
           from collections import deque
           import numpy as np
+
+          ImageFile.LOAD_TRUNCATED_IMAGES = True
 
           root = Path('.')
           feature_names = [
