@@ -32,7 +32,7 @@ const staff=Math.max(1,Math.ceil(guests/(service[1]*hours)));
 entertainers+=staff;
 longest=Math.max(longest,guests/(service[1]*staff));
 });
-const recommendedHours=Math.ceil(longest*2)/2;
+const recommendedHours=Math.ceil(longest*2)/2+0.5;
 const travel=location==="Austin"?"Austin-area travel/setup time will be confirmed.":location==="Central Texas"?"Travel distance and any travel fee will be confirmed after the address is reviewed.":"Standard setup time is added before service begins.";
 const result=document.getElementById("calculator-result");
 result.innerHTML="<h3>"+names[key]+" Estimate</h3><div class=\"result-grid\"><div class=\"result-box\"><strong>"+guests+"</strong><span>Guests</span></div><div class=\"result-box\"><strong>"+recommendedHours+(recommendedHours===1?" hour":" hours")+"</strong><span>Estimated Service Time</span></div><div class=\"result-box\"><strong>"+entertainers+"</strong><span>Recommended Entertainers</span></div></div><p><strong>Location:</strong> "+location+"</p><p class=\"result-note\">This estimate assumes every guest may participate in each included service. "+travel+" Final staffing, travel time, availability and price are confirmed after your booking request.</p><a class=\"btn btn-secondary\" href=\"book.html?package="+key+"&guests="+encodeURIComponent(guests)+"&hours="+encodeURIComponent(hours)+"&location="+encodeURIComponent(location)+"\">REQUEST THIS BUNDLE</a>";
