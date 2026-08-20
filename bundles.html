@@ -26,7 +26,7 @@ const hours=Math.min(12,Math.max(1,Number(document.getElementById("calc-hours").
 document.getElementById("calc-hours").value=hours;
 const zipInput=document.getElementById("calc-zip");
 const zip=zipInput.value.trim();
-if(!/^\\d{5}$/.test(zip)){
+if(!/^\d{5}$/.test(zip)){
 zipInput.setCustomValidity("Please enter a 5-digit ZIP code.");
 zipInput.reportValidity();
 return;
