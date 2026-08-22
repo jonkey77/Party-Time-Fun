@@ -23,8 +23,95 @@
     document.head.appendChild(style);
   }
 
+  function setupReliableForms() {
+    var booking = document.getElementById("booking-form");
+    if (booking && !booking.dataset.reliableNativeSubmit) {
+      var replacement = booking.cloneNode(true);
+      replacement.dataset.reliableNativeSubmit = "true";
+      booking.parentNode.replaceChild(replacement, booking);
+      booking = replacement;
+
+      var packageMap = {
+        "Color & Fun Package":["Face Painting","Balloon Twisting"],
+        "Sparkle Package":["Glitter Bar","Glitter Tattoos"],
+        "Party Favorites Package":["Face Painting","Balloon Twisting","Glitter Tattoos"],
+        "Deluxe Party Package":["Face Painting","Balloon Twisting","Glitter Bar","Glitter Tattoos"],
+        "Ultimate Party Time Fun Package":["Face Painting","Balloon Twisting","Glitter Bar","Glitter Tattoos","Temporary Tattoo Designs"]
+      };
+      var packageSlugs = {
+        "color-fun":"Color & Fun Package",
+        "sparkle":"Sparkle Package",
+        "party-favorites":"Party Favorites Package",
+        "deluxe":"Deluxe Party Package",
+        "ultimate":"Ultimate Party Time Fun Package"
+      };
+      var packageSelect = booking.querySelector("#package-deal");
+      var checks = Array.prototype.slice.call(booking.querySelectorAll(".service-check"));
+      var serviceError = booking.querySelector("#service-error");
+
+      function applyPackage(name) {
+        if (!packageMap[name]) return;
+        var included = packageMap[name];
+        checks.forEach(function (box) { box.checked = included.indexOf(box.value) !== -1; });
+        if (serviceError) serviceError.style.display = "none";
+      }
+
+      if (packageSelect) {
+        packageSelect.addEventListener("change", function () { applyPackage(packageSelect.value); });
+        var requested = new URLSearchParams(window.location.search).get("package");
+        if (requested && packageSlugs[requested]) {
+          packageSelect.value = packageSlugs[requested];
+          applyPackage(packageSelect.value);
+        }
+      }
+
+      booking.addEventListener("submit", function (event) {
+        var hasService = checks.some(function (box) { return box.checked; });
+        if (!hasService) {
+          event.preventDefault();
+          if (serviceError) serviceError.style.display = "block";
+          if (checks[0]) checks[0].focus();
+          return;
+        }
+        var button = booking.querySelector('button[type="submit"]');
+        var status = booking.querySelector("#form-status");
+        if (status) {
+          status.style.color = "#4e1979";
+          status.textContent = "Sending your request…";
+        }
+        if (button) {
+          button.disabled = true;
+          button.textContent = "SENDING…";
+        }
+      });
+
+      checks.forEach(function (box) {
+        box.addEventListener("change", function () {
+          if (checks.some(function (item) { return item.checked; }) && serviceError) serviceError.style.display = "none";
+        });
+      });
+    }
+
+    var ratingForm = document.querySelector(".rating-form form");
+    if (ratingForm) {
+      ratingForm.action = "https://formspree.io/f/mbgrqolg";
+      ratingForm.method = "POST";
+      var subject = ratingForm.querySelector('input[name="_subject"]');
+      if (subject) subject.value = "New Party Time Fun Rating / Review";
+      ratingForm.querySelectorAll('input[name="_template"],input[name="_captcha"]').forEach(function (el) { el.remove(); });
+      var submit = ratingForm.querySelector('button[type="submit"]');
+      ratingForm.addEventListener("submit", function () {
+        if (submit) {
+          submit.disabled = true;
+          submit.textContent = "SENDING REVIEW…";
+        }
+      });
+    }
+  }
+
   function setupMobileMenu() {
     enhanceTrustSection();
+    setupReliableForms();
     document.querySelectorAll(".top .nav").forEach(function (nav, index) {
       var links = nav.querySelector(".links");
       if (!links || nav.querySelector(".mobile-menu-toggle")) return;
