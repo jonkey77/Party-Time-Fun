@@ -40,3 +40,19 @@
   .brand-name{font-size:34px}.brand-tag{letter-spacing:.08em}
   .mobile-menu-toggle{padding:9px 12px;font-size:13px}
 }
+
+/* Book Now mobile balance and overflow fix */
+@media(max-width:600px){
+  .form-layout{display:block;width:100%;max-width:100%;margin:0 auto;padding:34px 14px 54px;overflow-x:hidden}
+  .form-layout>*{width:100%;max-width:100%;min-width:0;margin-left:auto;margin-right:auto}
+  .info-panel{padding:24px 20px;border-radius:22px;margin-bottom:22px}
+  .form-card{width:100%;max-width:100%;min-width:0;padding:24px 16px;border-radius:22px;overflow:hidden}
+  .form-card h1{font-size:clamp(32px,10vw,40px);line-height:1.05}
+  .form-grid,.field,.field.full,.checks{width:100%;max-width:100%;min-width:0}
+  .field.full{grid-column:auto}
+  input,select,textarea,.submit{display:block;width:100%;max-width:100%;min-width:0}
+  select{white-space:normal;text-overflow:ellipsis}
+  .checks{padding:13px}
+  .hero-inner>div{min-width:0}
+  .hero h2{font-size:clamp(38px,12vw,52px)!important;line-height:1!important;overflow-wrap:anywhere}
+}
