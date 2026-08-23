@@ -23,6 +23,56 @@
     document.head.appendChild(style);
   }
 
+  function enhanceGallerySections() {
+    var categories = Array.prototype.slice.call(document.querySelectorAll("main .gallery-category"));
+    if (!categories.length || document.getElementById("gallery-category-nav")) return;
+
+    var style = document.createElement("style");
+    style.id = "gallery-category-nav-style";
+    style.textContent = [
+      ".gallery-category-nav{margin:18px auto 42px;padding:22px;background:#fff;border-radius:24px;box-shadow:0 12px 30px rgba(65,22,91,.10);text-align:center;}",
+      ".gallery-category-nav h2{margin:0 0 14px;color:#4e1979;font-size:clamp(28px,4vw,40px);}",
+      ".gallery-category-nav p{margin:0 auto 18px;max-width:720px;line-height:1.55;color:#68457c;}",
+      ".gallery-category-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}",
+      ".gallery-category-links a{display:inline-flex;align-items:center;justify-content:center;padding:11px 15px;border-radius:999px;background:#f4eafb;color:#4e1979;font-weight:900;border:2px solid #ead8f1;}",
+      ".gallery-category-links a:hover{background:#4e1979;color:#fff;}",
+      ".gallery-category{scroll-margin-top:130px;}",
+      ".gallery-category>h2{padding-bottom:12px;border-bottom:4px solid var(--accent);}",
+      "@media(max-width:600px){.gallery-category-nav{margin:8px 0 28px;padding:18px 12px}.gallery-category-links{gap:8px}.gallery-category-links a{width:100%;padding:12px 14px}.gallery-category{margin-top:36px!important;margin-bottom:44px!important}.gallery-category>h2{font-size:32px!important}}
+    "].join("");
+    document.head.appendChild(style);
+
+    var labels = {
+      "Face Painting":"🎨 Face Painting",
+      "Balloon Twisting":"🎈 Balloon Twisting",
+      "Custom Balloon Centerpieces":"🎈 Balloon Centerpieces",
+      "Glitter Bar":"✨ Glitter Bar",
+      "Glitter Tattoos":"✨ Glitter Tattoos",
+      "Temporary Tattoo Designs":"⭐ Temporary Tattoos"
+    };
+
+    var nav = document.createElement("section");
+    nav.className = "gallery-category-nav";
+    nav.id = "gallery-category-nav";
+    nav.innerHTML = '<h2>Browse the Gallery</h2><p>Choose a category to jump directly to the type of entertainment you want to see.</p><div class="gallery-category-links"></div>';
+    var links = nav.querySelector(".gallery-category-links");
+
+    categories.forEach(function (section, index) {
+      var heading = section.querySelector("h2");
+      if (!heading) return;
+      var name = heading.textContent.trim();
+      var id = "gallery-" + name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (!id || id === "gallery-") id = "gallery-category-" + (index + 1);
+      section.id = id;
+      var link = document.createElement("a");
+      link.href = "#" + id;
+      link.textContent = labels[name] || name;
+      links.appendChild(link);
+    });
+
+    categories[0].parentNode.insertBefore(nav, categories[0]);
+  }
+
   function setupReliableForms() {
     var booking = document.getElementById("booking-form");
     if (booking && !booking.dataset.reliableNativeSubmit) {
@@ -111,6 +161,7 @@
 
   function setupMobileMenu() {
     enhanceTrustSection();
+    enhanceGallerySections();
     setupReliableForms();
     document.querySelectorAll(".top .nav").forEach(function (nav, index) {
       var links = nav.querySelector(".links");
