@@ -5,21 +5,10 @@
     if (!document.body.classList.contains("home-theme")) return;
     var logo = document.querySelector(".hero-logo-card img");
     if (!logo) return;
-    var webpSrc = "./assets/logo-transparent.webp?v=20260823-1";
-    logo.src = webpSrc;
+    logo.src = "./logo-transparent.png?v=20260823-2";
     logo.setAttribute("loading", "eager");
     logo.setAttribute("fetchpriority", "high");
     logo.setAttribute("decoding", "async");
-    if (!document.getElementById("homepage-logo-webp-preload")) {
-      var preload = document.createElement("link");
-      preload.id = "homepage-logo-webp-preload";
-      preload.rel = "preload";
-      preload.as = "image";
-      preload.href = webpSrc;
-      preload.type = "image/webp";
-      preload.setAttribute("fetchpriority", "high");
-      document.head.appendChild(preload);
-    }
   }
 
   function enhanceTrustSection() {
