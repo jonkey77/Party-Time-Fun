@@ -4,17 +4,11 @@
   function enhanceHomepageLogoFormat() {
     if (!document.body.classList.contains("home-theme")) return;
     var logo = document.querySelector(".hero-logo-card img");
-    if (!logo || logo.parentElement.tagName.toLowerCase() === "picture") return;
+    if (!logo) return;
+    logo.setAttribute("src", "./logo-transparent.png?v=20260823-4");
     logo.setAttribute("loading", "eager");
     logo.setAttribute("fetchpriority", "high");
     logo.setAttribute("decoding", "async");
-    var picture = document.createElement("picture");
-    var webp = document.createElement("source");
-    webp.srcset = "./assets/logo-transparent.webp?v=20260823-3";
-    webp.type = "image/webp";
-    logo.parentNode.insertBefore(picture, logo);
-    picture.appendChild(webp);
-    picture.appendChild(logo);
   }
 
   function enhanceTrustSection() {
