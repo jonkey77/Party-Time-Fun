@@ -1,14 +1,20 @@
 (function () {
   "use strict";
 
-  function optimizeHomepageLogo() {
+  function enhanceHomepageLogoFormat() {
     if (!document.body.classList.contains("home-theme")) return;
     var logo = document.querySelector(".hero-logo-card img");
-    if (!logo) return;
-    logo.src = "./logo-transparent.png?v=20260823-2";
+    if (!logo || logo.parentElement.tagName.toLowerCase() === "picture") return;
     logo.setAttribute("loading", "eager");
     logo.setAttribute("fetchpriority", "high");
     logo.setAttribute("decoding", "async");
+    var picture = document.createElement("picture");
+    var webp = document.createElement("source");
+    webp.srcset = "./assets/logo-transparent.webp?v=20260823-3";
+    webp.type = "image/webp";
+    logo.parentNode.insertBefore(picture, logo);
+    picture.appendChild(webp);
+    picture.appendChild(logo);
   }
 
   function enhanceTrustSection() {
@@ -78,10 +84,7 @@
     var wrap = document.createElement("div");
     wrap.className = "back-top-wrap";
     wrap.innerHTML = '<a class="back-top-link" href="#" aria-label="Back to top of page">↑ Back to Top</a>';
-    wrap.querySelector("a").addEventListener("click", function(event){
-      event.preventDefault();
-      window.scrollTo({top:0,behavior:"smooth"});
-    });
+    wrap.querySelector("a").addEventListener("click", function(event){event.preventDefault();window.scrollTo({top:0,behavior:"smooth"});});
     footer.parentNode.insertBefore(wrap, footer);
   }
 
@@ -95,6 +98,6 @@
 
   function setupReliableForms(){var booking=document.getElementById("booking-form");if(booking&&!booking.dataset.reliableNativeSubmit){var replacement=booking.cloneNode(true);replacement.dataset.reliableNativeSubmit="true";booking.parentNode.replaceChild(replacement,booking);booking=replacement;var packageMap={"Color & Fun Package":["Face Painting","Balloon Twisting"],"Sparkle Package":["Glitter Bar","Glitter Tattoos"],"Party Favorites Package":["Face Painting","Balloon Twisting","Glitter Tattoos"],"Deluxe Party Package":["Face Painting","Balloon Twisting","Glitter Bar","Glitter Tattoos"],"Ultimate Party Time Fun Package":["Face Painting","Balloon Twisting","Glitter Bar","Glitter Tattoos","Temporary Tattoo Designs"]};var packageSlugs={"color-fun":"Color & Fun Package","sparkle":"Sparkle Package","party-favorites":"Party Favorites Package","deluxe":"Deluxe Party Package","ultimate":"Ultimate Party Time Fun Package"};var packageSelect=booking.querySelector("#package-deal");var checks=Array.prototype.slice.call(booking.querySelectorAll(".service-check"));var serviceError=booking.querySelector("#service-error");function applyPackage(name){if(!packageMap[name])return;var included=packageMap[name];checks.forEach(function(box){box.checked=included.indexOf(box.value)!==-1});if(serviceError)serviceError.style.display="none"}if(packageSelect){packageSelect.addEventListener("change",function(){applyPackage(packageSelect.value)});var requested=new URLSearchParams(window.location.search).get("package");if(requested&&packageSlugs[requested]){packageSelect.value=packageSlugs[requested];applyPackage(packageSelect.value)}}booking.addEventListener("submit",function(event){var hasService=checks.some(function(box){return box.checked});if(!hasService){event.preventDefault();if(serviceError)serviceError.style.display="block";if(checks[0])checks[0].focus();return}var button=booking.querySelector('button[type="submit"]');var status=booking.querySelector("#form-status");if(status)status.textContent="Sending your request…";if(button){button.disabled=true;button.textContent="SENDING…"}})}}
 
-  function setupMobileMenu(){optimizeHomepageLogo();enhanceTrustSection();enhanceGallerySections();addBackToHome();addHomepageBackToTop();removeDuplicateMobileBookNow();setupReliableForms();document.querySelectorAll(".top .nav").forEach(function(nav,index){var links=nav.querySelector(".links");if(!links||nav.querySelector(".mobile-menu-toggle"))return;if(!links.id)links.id="site-menu-"+(index+1);var button=document.createElement("button");button.className="mobile-menu-toggle";button.type="button";button.setAttribute("aria-controls",links.id);button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU';nav.insertBefore(button,links);nav.classList.add("mobile-menu-ready");function closeMenu(){links.classList.remove("mobile-open");button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU'}button.addEventListener("click",function(){var open=links.classList.toggle("mobile-open");button.setAttribute("aria-expanded",String(open));button.setAttribute("aria-label",open?"Close navigation menu":"Open navigation menu");button.innerHTML=open?'<span aria-hidden="true">✕</span> CLOSE':'<span aria-hidden="true">☰</span> MENU'});links.querySelectorAll("a").forEach(function(link){link.addEventListener("click",closeMenu)});document.addEventListener("keydown",function(event){if(event.key==="Escape"){closeMenu();button.focus()}});window.addEventListener("resize",function(){if(window.innerWidth>1050)closeMenu()})})}
+  function setupMobileMenu(){enhanceHomepageLogoFormat();enhanceTrustSection();enhanceGallerySections();addBackToHome();addHomepageBackToTop();removeDuplicateMobileBookNow();setupReliableForms();document.querySelectorAll(".top .nav").forEach(function(nav,index){var links=nav.querySelector(".links");if(!links||nav.querySelector(".mobile-menu-toggle"))return;if(!links.id)links.id="site-menu-"+(index+1);var button=document.createElement("button");button.className="mobile-menu-toggle";button.type="button";button.setAttribute("aria-controls",links.id);button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU';nav.insertBefore(button,links);nav.classList.add("mobile-menu-ready");function closeMenu(){links.classList.remove("mobile-open");button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU'}button.addEventListener("click",function(){var open=links.classList.toggle("mobile-open");button.setAttribute("aria-expanded",String(open));button.setAttribute("aria-label",open?"Close navigation menu":"Open navigation menu");button.innerHTML=open?'<span aria-hidden="true">✕</span> CLOSE':'<span aria-hidden="true">☰</span> MENU'});links.querySelectorAll("a").forEach(function(link){link.addEventListener("click",closeMenu)});document.addEventListener("keydown",function(event){if(event.key==="Escape"){closeMenu();button.focus()}});window.addEventListener("resize",function(){if(window.innerWidth>1050)closeMenu()})})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setupMobileMenu);else setupMobileMenu();
 }());
