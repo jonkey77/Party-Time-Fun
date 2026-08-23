@@ -84,7 +84,7 @@
       var heading=section.querySelector("h2");if(!heading)return;
       var name=heading.textContent.trim();
       var actions=document.createElement("div");actions.className="gallery-service-actions";
-      actions.innerHTML='<a class="gallery-back-services" href="'+(backLinks[name]||'services.html')+'">← BACK TO SERVICES</a><a class="gallery-book-service" href="book.html">BOOK THIS SERVICE →</a>';
+      actions.innerHTML='<a class="gallery-back-services" href="'+(backLinks[name]||'services.html')+'">← BACK TO SERVICES</a><a class="gallery-book-service" href="bundles.html">VIEW PACKAGES &amp; BUNDLES →</a>';
       section.appendChild(actions);
     });
   }
