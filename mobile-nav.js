@@ -51,6 +51,44 @@
     categories[0].parentNode.insertBefore(nav,categories[0]);
   }
 
+  function enhanceServiceGalleryFlow() {
+    var serviceMap={
+      "Face Painting":"service-face-painting",
+      "Balloon Twisting":"service-balloon-twisting",
+      "Glitter Bar":"service-glitter-bar",
+      "Glitter Tattoos":"service-glitter-tattoos",
+      "Airbrush Tattoos":"service-airbrush-tattoos"
+    };
+    document.querySelectorAll("main .section h2").forEach(function(heading){
+      var name=heading.textContent.trim();
+      if(serviceMap[name]){var section=heading.closest(".section");if(section&&!section.id)section.id=serviceMap[name];}
+    });
+    var categories=Array.prototype.slice.call(document.querySelectorAll("main .gallery-category"));
+    if(!categories.length)return;
+    if(!document.getElementById("gallery-service-actions-style")){
+      var style=document.createElement("style");
+      style.id="gallery-service-actions-style";
+      style.textContent=".gallery-service-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:28px auto 4px}.gallery-service-actions a{display:inline-flex;align-items:center;justify-content:center;min-width:170px;padding:11px 18px;border-radius:999px;text-decoration:none;font-size:14px;font-weight:900;box-sizing:border-box}.gallery-back-services{border:2px solid #4e1979;background:#fff;color:#4e1979}.gallery-back-services:hover{background:#f5ecfb}.gallery-book-service{border:2px solid #f51b9a;background:#f51b9a;color:#fff;box-shadow:0 6px 16px rgba(245,27,154,.20)}.gallery-book-service:hover{filter:brightness(.96)}@media(max-width:520px){.gallery-service-actions{gap:9px;margin-top:22px}.gallery-service-actions a{width:100%;max-width:310px;min-width:0;padding:12px 16px;font-size:14px}}";
+      document.head.appendChild(style);
+    }
+    var backLinks={
+      "Face Painting":"services.html#service-face-painting",
+      "Balloon Twisting":"services.html#service-balloon-twisting",
+      "Custom Balloon Centerpieces":"services.html",
+      "Glitter Bar":"services.html#service-glitter-bar",
+      "Glitter Tattoos":"services.html#service-glitter-tattoos",
+      "Temporary Tattoo Designs":"services.html#service-airbrush-tattoos"
+    };
+    categories.forEach(function(section){
+      if(section.querySelector(".gallery-service-actions"))return;
+      var heading=section.querySelector("h2");if(!heading)return;
+      var name=heading.textContent.trim();
+      var actions=document.createElement("div");actions.className="gallery-service-actions";
+      actions.innerHTML='<a class="gallery-back-services" href="'+(backLinks[name]||'services.html')+'">← BACK TO SERVICES</a><a class="gallery-book-service" href="book.html">BOOK THIS SERVICE →</a>';
+      section.appendChild(actions);
+    });
+  }
+
   function addBackToHome() {
     if (document.body.classList.contains("home-theme") || document.querySelector(".back-home-wrap")) return;
     var footer = document.querySelector("footer");
@@ -92,6 +130,6 @@
 
   function setupReliableForms(){var booking=document.getElementById("booking-form");if(booking&&!booking.dataset.reliableNativeSubmit){var replacement=booking.cloneNode(true);replacement.dataset.reliableNativeSubmit="true";booking.parentNode.replaceChild(replacement,booking);booking=replacement;var packageMap={"Color & Fun Package":["Face Painting","Balloon Twisting"],"Sparkle Package":["Glitter Bar","Glitter Tattoos"],"Party Favorites Package":["Face Painting","Balloon Twisting","Glitter Tattoos"],"Deluxe Party Package":["Face Painting","Balloon Twisting","Glitter Bar","Glitter Tattoos"],"Ultimate Party Time Fun Package":["Face Painting","Balloon Twisting","Glitter Bar","Glitter Tattoos","Temporary Tattoo Designs"]};var packageSlugs={"color-fun":"Color & Fun Package","sparkle":"Sparkle Package","party-favorites":"Party Favorites Package","deluxe":"Deluxe Party Package","ultimate":"Ultimate Party Time Fun Package"};var packageSelect=booking.querySelector("#package-deal");var checks=Array.prototype.slice.call(booking.querySelectorAll(".service-check"));var serviceError=booking.querySelector("#service-error");function applyPackage(name){if(!packageMap[name])return;var included=packageMap[name];checks.forEach(function(box){box.checked=included.indexOf(box.value)!==-1});if(serviceError)serviceError.style.display="none"}if(packageSelect){packageSelect.addEventListener("change",function(){applyPackage(packageSelect.value)});var requested=new URLSearchParams(window.location.search).get("package");if(requested&&packageSlugs[requested]){packageSelect.value=packageSlugs[requested];applyPackage(packageSelect.value)}}booking.addEventListener("submit",function(event){var hasService=checks.some(function(box){return box.checked});if(!hasService){event.preventDefault();if(serviceError)serviceError.style.display="block";if(checks[0])checks[0].focus();return}var button=booking.querySelector('button[type="submit"]');var status=booking.querySelector("#form-status");if(status)status.textContent="Sending your request…";if(button){button.disabled=true;button.textContent="SENDING…"}})}}
 
-  function setupMobileMenu(){enhanceHomepageLogoFormat();enhanceTrustSection();enhanceGallerySections();addBackToHome();addHomepageBackToTop();removeDuplicateMobileBookNow();setupReliableForms();document.querySelectorAll(".top .nav").forEach(function(nav,index){var links=nav.querySelector(".links");if(!links||nav.querySelector(".mobile-menu-toggle"))return;if(!links.id)links.id="site-menu-"+(index+1);var button=document.createElement("button");button.className="mobile-menu-toggle";button.type="button";button.setAttribute("aria-controls",links.id);button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU';nav.insertBefore(button,links);nav.classList.add("mobile-menu-ready");function closeMenu(){links.classList.remove("mobile-open");button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU'}button.addEventListener("click",function(){var open=links.classList.toggle("mobile-open");button.setAttribute("aria-expanded",String(open));button.setAttribute("aria-label",open?"Close navigation menu":"Open navigation menu");button.innerHTML=open?'<span aria-hidden="true">✕</span> CLOSE':'<span aria-hidden="true">☰</span> MENU'});links.querySelectorAll("a").forEach(function(link){link.addEventListener("click",closeMenu)});document.addEventListener("keydown",function(event){if(event.key==="Escape"){closeMenu();button.focus()}});window.addEventListener("resize",function(){if(window.innerWidth>1050)closeMenu()})})}
+  function setupMobileMenu(){enhanceHomepageLogoFormat();enhanceTrustSection();enhanceGallerySections();enhanceServiceGalleryFlow();addBackToHome();addHomepageBackToTop();removeDuplicateMobileBookNow();setupReliableForms();document.querySelectorAll(".top .nav").forEach(function(nav,index){var links=nav.querySelector(".links");if(!links||nav.querySelector(".mobile-menu-toggle"))return;if(!links.id)links.id="site-menu-"+(index+1);var button=document.createElement("button");button.className="mobile-menu-toggle";button.type="button";button.setAttribute("aria-controls",links.id);button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU';nav.insertBefore(button,links);nav.classList.add("mobile-menu-ready");function closeMenu(){links.classList.remove("mobile-open");button.setAttribute("aria-expanded","false");button.setAttribute("aria-label","Open navigation menu");button.innerHTML='<span aria-hidden="true">☰</span> MENU'}button.addEventListener("click",function(){var open=links.classList.toggle("mobile-open");button.setAttribute("aria-expanded",String(open));button.setAttribute("aria-label",open?"Close navigation menu":"Open navigation menu");button.innerHTML=open?'<span aria-hidden="true">✕</span> CLOSE':'<span aria-hidden="true">☰</span> MENU'});links.querySelectorAll("a").forEach(function(link){link.addEventListener("click",closeMenu)});document.addEventListener("keydown",function(event){if(event.key==="Escape"){closeMenu();button.focus()}});window.addEventListener("resize",function(){if(window.innerWidth>1050)closeMenu()})})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setupMobileMenu);else setupMobileMenu();
 }());
