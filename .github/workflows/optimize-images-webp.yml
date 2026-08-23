@@ -1,0 +1,98 @@
+name: Optimize active site images to WebP
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/optimize-images-webp.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Convert active heavy PNG images to WebP
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageFile
+
+          ImageFile.LOAD_TRUNCATED_IMAGES = True
+          root = Path('.')
+          assets = root / 'assets'
+
+          names = [
+              'face-feature.png',
+              'face-gallery1.png','face-gallery2.png','face-gallery3.png','face-gallery4.png','face-gallery5.png',
+              'balloon-feature.png','balloon1.png','balloon2.png','balloon3.png','balloon4.png',
+              'glitter-feature.png','glitter1.png','glitter2.png','glitter3.png','glitter4.png',
+              'glittertat-feature.png','glittertat1.png','glittertat2.png','glittertat3.png','glittertat4.png',
+              'temp-rose.png','temp-tribal.png','temp-seahorse.png'
+          ]
+
+          converted = []
+          for name in names:
+              src = assets / name
+              if not src.exists():
+                  continue
+              dst = src.with_suffix('.webp')
+              with Image.open(src) as im:
+                  im.load()
+                  # Keep transparency when present; otherwise save RGB for smaller files.
+                  if im.mode in ('RGBA', 'LA') or ('transparency' in im.info):
+                      out = im.convert('RGBA')
+                  else:
+                      out = im.convert('RGB')
+                  out.save(dst, 'WEBP', quality=82, method=6)
+              converted.append((src, dst))
+
+          # Update every site text file that could reference these image names.
+          text_files = list(root.glob('*.html')) + list(root.glob('*.css')) + list(root.glob('*.js'))
+          for p in text_files:
+              text = p.read_text(encoding='utf-8')
+              original = text
+              for src, dst in converted:
+                  text = text.replace(src.name, dst.name)
+              if text != original:
+                  p.write_text(text, encoding='utf-8')
+
+          # Remove PNG originals only after successful WebP creation and reference updates.
+          for src, dst in converted:
+              if dst.exists() and dst.stat().st_size > 0:
+                  src.unlink()
+
+          print(f'Converted {len(converted)} active PNG images to WebP.')
+          PY
+
+      - name: Show image-size savings
+        shell: bash
+        run: |
+          du -sh assets || true
+          find assets -maxdepth 1 -type f -name '*.webp' -printf '%f %k KB\n' | sort
+
+      - name: Commit optimized images and updated references
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A assets *.html *.css *.js
+          if git diff --cached --quiet; then
+            echo 'No optimization changes were needed.'
+          else
+            git commit -m 'Optimize active gallery images to WebP'
+            git push origin HEAD:main
+          fi
