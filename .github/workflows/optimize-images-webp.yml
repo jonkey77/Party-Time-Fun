@@ -61,7 +61,21 @@ jobs:
           p.write_text(text, encoding='utf-8')
           PY
 
-      - name: Commit optimized assets and gallery layout
+      - name: Keep homepage service labels on one line on mobile
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('mobile-nav.js')
+          text = p.read_text(encoding='utf-8')
+          marker = '.home-theme .trust-item:nth-child(5){background:#f4f9ff!important;border-color:#c9def2!important}'
+          addition = '.home-theme .service-bubble h3{white-space:nowrap!important;font-size:18px!important;padding-left:10px!important;padding-right:10px!important}'
+          if addition not in text and marker in text:
+              text = text.replace(marker, marker + addition, 1)
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit optimized assets and layout fixes
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
@@ -70,6 +84,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No changes were needed.'
           else
-            git commit -m 'Keep gallery categories on one desktop line'
+            git commit -m 'Keep mobile service labels on one line'
             git push origin HEAD:main
           fi
