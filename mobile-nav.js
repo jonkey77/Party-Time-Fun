@@ -5,7 +5,7 @@
     if (!document.body.classList.contains("home-theme")) return;
     var logo = document.querySelector(".hero-logo-card img");
     if (!logo) return;
-    logo.setAttribute("src", "./logo-transparent.png?v=20260823-4");
+    logo.setAttribute("src", "./logo-transparent.webp?v=20260823-4");
     logo.setAttribute("loading", "eager");
     logo.setAttribute("fetchpriority", "high");
     logo.setAttribute("decoding", "async");
