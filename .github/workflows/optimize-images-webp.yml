@@ -36,45 +36,55 @@ jobs:
           source = root / 'logo-transparent.webp'
           if not source.exists():
               source = root / 'logo-transparent.png'
-          if not source.exists():
-              raise SystemExit('Homepage logo source not found')
+          if source.exists():
+              mobile = root / 'logo-transparent-mobile.webp'
+              with Image.open(source) as im:
+                  im.load()
+                  out = im.convert('RGBA')
+                  max_width = 420
+                  if out.width > max_width:
+                      new_height = round(out.height * max_width / out.width)
+                      out = out.resize((max_width, new_height), Image.Resampling.LANCZOS)
+                  out.save(mobile, 'WEBP', quality=76, method=6)
 
-          mobile = root / 'logo-transparent-mobile.webp'
-          with Image.open(source) as im:
-              im.load()
-              out = im.convert('RGBA')
-              max_width = 420
-              if out.width > max_width:
-                  new_height = round(out.height * max_width / out.width)
-                  out = out.resize((max_width, new_height), Image.Resampling.LANCZOS)
-              out.save(mobile, 'WEBP', quality=76, method=6)
+              index = root / 'index.html'
+              text = index.read_text(encoding='utf-8')
+              old_preload = '<link rel="preload" as="image" href="./logo-transparent.webp?v=20260819-3" fetchpriority="high">'
+              new_preload = '<link rel="preload" as="image" href="./logo-transparent-mobile.webp?v=20260824-1" media="(max-width:700px)" fetchpriority="high">\n<link rel="preload" as="image" href="./logo-transparent.webp?v=20260819-3" media="(min-width:701px)" fetchpriority="high">'
+              text = text.replace(old_preload, new_preload)
+              old_img = '<div class="hero-logo-card"><img src="./logo-transparent.webp?v=20260819-3" alt="Party Time Fun Face Painting logo" loading="eager" fetchpriority="high" decoding="async"></div>'
+              new_img = '<div class="hero-logo-card"><picture><source media="(max-width:700px)" srcset="./logo-transparent-mobile.webp?v=20260824-1"><img src="./logo-transparent.webp?v=20260819-3" alt="Party Time Fun Face Painting logo" loading="eager" fetchpriority="high" decoding="async"></picture></div>'
+              text = text.replace(old_img, new_img, 1)
+              index.write_text(text, encoding='utf-8')
+          PY
 
-          index = root / 'index.html'
-          text = index.read_text(encoding='utf-8')
-          old_preload = '<link rel="preload" as="image" href="./logo-transparent.webp?v=20260819-3" fetchpriority="high">'
-          new_preload = '<link rel="preload" as="image" href="./logo-transparent-mobile.webp?v=20260824-1" media="(max-width:700px)" fetchpriority="high">\n<link rel="preload" as="image" href="./logo-transparent.webp?v=20260819-3" media="(min-width:701px)" fetchpriority="high">'
-          text = text.replace(old_preload, new_preload)
-          old_img = '<div class="hero-logo-card"><img src="./logo-transparent.webp?v=20260819-3" alt="Party Time Fun Face Painting logo" loading="eager" fetchpriority="high" decoding="async"></div>'
-          new_img = '<div class="hero-logo-card"><picture><source media="(max-width:700px)" srcset="./logo-transparent-mobile.webp?v=20260824-1"><img src="./logo-transparent.webp?v=20260819-3" alt="Party Time Fun Face Painting logo" loading="eager" fetchpriority="high" decoding="async"></picture></div>'
-          if old_img not in text:
-              raise SystemExit('Homepage hero logo markup was not found; no HTML changed')
-          text = text.replace(old_img, new_img, 1)
-          index.write_text(text, encoding='utf-8')
-          print('Created mobile logo:', mobile.stat().st_size, 'bytes')
+      - name: Keep gallery browsing inside the gallery
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('mobile-nav.js')
+          text = p.read_text(encoding='utf-8')
+          old = "actions.innerHTML='<a class=\"gallery-back-services\" href=\"'+(backLinks[name]||'services.html')+'\">← BACK TO SERVICES</a><a class=\"gallery-book-service\" href=\"bundles.html\">VIEW PACKAGES &amp; BUNDLES →</a>';"
+          new = "actions.innerHTML='<a class=\"gallery-back-services\" href=\"#gallery-category-nav\">← BACK TO GALLERY CATEGORIES</a><a class=\"gallery-book-service\" href=\"bundles.html\">VIEW PACKAGES &amp; BUNDLES →</a>';"
+          if old not in text:
+              raise SystemExit('Gallery action markup not found; no change made')
+          text = text.replace(old, new, 1)
+          p.write_text(text, encoding='utf-8')
           PY
 
       - name: Show mobile logo size
         run: ls -lh logo-transparent.webp logo-transparent-mobile.webp 2>/dev/null || true
 
-      - name: Commit mobile logo and homepage reference
+      - name: Commit optimized mobile assets and navigation
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html logo-transparent-mobile.webp
+          git add index.html mobile-nav.js logo-transparent-mobile.webp 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo 'No mobile logo optimization changes were needed.'
+            echo 'No optimization or navigation changes were needed.'
           else
-            git commit -m 'Use lightweight logo on mobile homepage'
+            git commit -m 'Optimize mobile logo and gallery navigation'
             git push origin HEAD:main
           fi
