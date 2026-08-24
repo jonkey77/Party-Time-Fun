@@ -125,7 +125,7 @@
     if (document.getElementById("single-mobile-book-now")) return;
     var style = document.createElement("style");
     style.id = "single-mobile-book-now";
-    style.textContent = '@media(max-width:1050px){.top .links a[href="./book.html"]:not(.book-pill){display:none!important}}';
+    style.textContent = '@media(min-width:1051px){.top .links .book-pill{display:none!important}}@media(max-width:1050px){.top .links a[href="./book.html"]:not(.book-pill),.top .links a[href="book.html"]:not(.book-pill){display:none!important}}';
     document.head.appendChild(style);
   }
 
