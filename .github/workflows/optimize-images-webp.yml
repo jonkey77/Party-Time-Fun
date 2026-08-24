@@ -48,22 +48,36 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-
           index = Path('index.html')
           text = index.read_text(encoding='utf-8')
-
           old_title = '.service-bubble h3{display:inline-block;position:relative;margin:-11px auto 0;padding:9px 17px;border-radius:999px;color:#fff;font-family:"Brush Script MT","Segoe Script",cursive;font-size:23px;line-height:1}'
           new_title = '.service-bubble h3{display:inline-block;position:relative;margin:-11px auto 0;padding:9px 17px;border-radius:999px;color:#fff;font-family:Arial,Helvetica,sans-serif;font-size:18px;line-height:1.15;font-weight:900;letter-spacing:.01em;text-shadow:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}'
           if old_title in text:
               text = text.replace(old_title, new_title, 1)
-
           old_note = '.service-note{display:block;margin:9px auto 0;max-width:175px;color:#5d2a84;font-size:12px;line-height:1.35;font-weight:700}'
           new_note = '.service-note{display:block;margin:9px auto 0;max-width:175px;color:#46146f;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.42;font-weight:800;letter-spacing:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}'
           if old_note in text:
               text = text.replace(old_note, new_note, 1)
-
-          text = text.replace('mobile-nav.js?v=20260823-5', 'mobile-nav.js?v=20260824-7')
           index.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Remove Book Now links from desktop headers
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          css = Path('styles.css')
+          text = css.read_text(encoding='utf-8')
+          rule = '\n/* Hide header Book Now links on desktop; mobile keeps the booking pill. */\n@media(min-width:1051px){.top .links a[href$="book.html"]{display:none!important}}\n'
+          if 'a[href$="book.html"]{display:none!important}' not in text:
+              text += rule
+              css.write_text(text, encoding='utf-8')
+
+          for page in Path('.').glob('*.html'):
+              html = page.read_text(encoding='utf-8')
+              html = html.replace('styles.css?v=20260820-3', 'styles.css?v=20260824-8')
+              html = html.replace('./styles.css?v=20260820-3', './styles.css?v=20260824-8')
+              page.write_text(html, encoding='utf-8')
           PY
 
       - name: Keep gallery category buttons on one desktop line
@@ -92,15 +106,15 @@ jobs:
           p.write_text(text, encoding='utf-8')
           PY
 
-      - name: Commit typography and layout fixes
+      - name: Commit site fixes
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html mobile-nav.js logo-transparent-mobile.webp 2>/dev/null || true
+          git add *.html styles.css mobile-nav.js logo-transparent-mobile.webp 2>/dev/null || true
           if git diff --cached --quiet; then
             echo 'No changes were needed.'
           else
-            git commit -m 'Sharpen homepage service category fonts'
+            git commit -m 'Remove Book Now links from desktop headers'
             git push origin HEAD:main
           fi
