@@ -21,3 +21,6 @@
 /* Larger synchronized mobile Party Time Fun branding */
 @media(max-width:700px){.top .brandmark{display:flex;flex-direction:column;justify-content:center;min-width:0}.top .brand-name{font-size:44px;line-height:.9;white-space:nowrap}.top .brand-tag{margin-top:8px;font-size:13px;line-height:1.2;letter-spacing:.025em;white-space:nowrap;font-weight:900}}
 @media(max-width:420px){.top .brand-name{font-size:40px}.top .brand-tag{font-size:12px;letter-spacing:.015em}}
+
+/* Hide header Book Now links on desktop; mobile keeps the booking pill. */
+@media(min-width:1051px){.top .links a[href$="book.html"]{display:none!important}}
