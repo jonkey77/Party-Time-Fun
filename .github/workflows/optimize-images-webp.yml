@@ -43,6 +43,29 @@ jobs:
                   out.save(mobile, 'WEBP', quality=76, method=6)
           PY
 
+      - name: Apply sharper homepage service typography
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+
+          old_title = '.service-bubble h3{display:inline-block;position:relative;margin:-11px auto 0;padding:9px 17px;border-radius:999px;color:#fff;font-family:"Brush Script MT","Segoe Script",cursive;font-size:23px;line-height:1}'
+          new_title = '.service-bubble h3{display:inline-block;position:relative;margin:-11px auto 0;padding:9px 17px;border-radius:999px;color:#fff;font-family:Arial,Helvetica,sans-serif;font-size:18px;line-height:1.15;font-weight:900;letter-spacing:.01em;text-shadow:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}'
+          if old_title in text:
+              text = text.replace(old_title, new_title, 1)
+
+          old_note = '.service-note{display:block;margin:9px auto 0;max-width:175px;color:#5d2a84;font-size:12px;line-height:1.35;font-weight:700}'
+          new_note = '.service-note{display:block;margin:9px auto 0;max-width:175px;color:#46146f;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.42;font-weight:800;letter-spacing:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}'
+          if old_note in text:
+              text = text.replace(old_note, new_note, 1)
+
+          text = text.replace('mobile-nav.js?v=20260823-5', 'mobile-nav.js?v=20260824-7')
+          index.write_text(text, encoding='utf-8')
+          PY
+
       - name: Keep gallery category buttons on one desktop line
         shell: bash
         run: |
@@ -50,14 +73,8 @@ jobs:
           from pathlib import Path
           p = Path('mobile-nav.js')
           text = p.read_text(encoding='utf-8')
-          old = '".gallery-category-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}",'
-          new = '".gallery-category-links{display:flex;flex-wrap:nowrap;gap:10px;justify-content:center;align-items:center}",'
-          if old in text:
-              text = text.replace(old, new, 1)
-          old_mobile = '"@media(max-width:600px){.gallery-category-nav{margin:8px 0 28px;padding:18px 12px}.gallery-category-links{gap:8px}.gallery-category-links a{width:100%;padding:12px 14px}.gallery-category{margin-top:36px!important;margin-bottom:44px!important}.gallery-category>h2{font-size:32px!important}}"'
-          new_mobile = '"@media(max-width:600px){.gallery-category-nav{margin:8px 0 28px;padding:18px 12px}.gallery-category-links{gap:8px;flex-wrap:wrap}.gallery-category-links a{width:100%;padding:12px 14px}.gallery-category{margin-top:36px!important;margin-bottom:44px!important}.gallery-category>h2{font-size:32px!important}}"'
-          if old_mobile in text:
-              text = text.replace(old_mobile, new_mobile, 1)
+          text = text.replace('".gallery-category-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}",','".gallery-category-links{display:flex;flex-wrap:nowrap;gap:10px;justify-content:center;align-items:center}",',1)
+          text = text.replace('"@media(max-width:600px){.gallery-category-nav{margin:8px 0 28px;padding:18px 12px}.gallery-category-links{gap:8px}.gallery-category-links a{width:100%;padding:12px 14px}.gallery-category{margin-top:36px!important;margin-bottom:44px!important}.gallery-category>h2{font-size:32px!important}}"','"@media(max-width:600px){.gallery-category-nav{margin:8px 0 28px;padding:18px 12px}.gallery-category-links{gap:8px;flex-wrap:wrap}.gallery-category-links a{width:100%;padding:12px 14px}.gallery-category{margin-top:36px!important;margin-bottom:44px!important}.gallery-category>h2{font-size:32px!important}}"',1)
           p.write_text(text, encoding='utf-8')
           PY
 
@@ -69,35 +86,21 @@ jobs:
           p = Path('mobile-nav.js')
           text = p.read_text(encoding='utf-8')
           marker = '.home-theme .trust-item:nth-child(5){background:#f4f9ff!important;border-color:#c9def2!important}'
-          addition = '.home-theme .service-bubble h3{white-space:nowrap!important;font-size:18px!important;padding-left:10px!important;padding-right:10px!important}'
+          addition = '.home-theme .service-bubble h3{white-space:nowrap!important;font-size:17px!important;padding-left:9px!important;padding-right:9px!important}'
           if addition not in text and marker in text:
               text = text.replace(marker, marker + addition, 1)
           p.write_text(text, encoding='utf-8')
           PY
 
-      - name: Sharpen homepage service typography
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('mobile-nav.js')
-          text = p.read_text(encoding='utf-8')
-          marker = '".home-theme .trust-check{display:none!important}",'
-          sharp = '".home-theme .service-bubble h3{font-family:Arial,Helvetica,sans-serif!important;font-weight:900!important;letter-spacing:.01em!important;text-shadow:none!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}.home-theme .service-note{font-family:Arial,Helvetica,sans-serif!important;font-size:13px!important;line-height:1.42!important;font-weight:800!important;color:#46146f!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}",'
-          if sharp not in text and marker in text:
-              text = text.replace(marker, marker + '\n      ' + sharp, 1)
-          p.write_text(text, encoding='utf-8')
-          PY
-
-      - name: Commit optimized assets and layout fixes
+      - name: Commit typography and layout fixes
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add mobile-nav.js logo-transparent-mobile.webp 2>/dev/null || true
+          git add index.html mobile-nav.js logo-transparent-mobile.webp 2>/dev/null || true
           if git diff --cached --quiet; then
             echo 'No changes were needed.'
           else
-            git commit -m 'Sharpen homepage service typography'
+            git commit -m 'Sharpen homepage service category fonts'
             git push origin HEAD:main
           fi
