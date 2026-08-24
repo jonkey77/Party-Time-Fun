@@ -24,7 +24,7 @@ jobs:
       - name: Install Pillow
         run: python -m pip install --disable-pip-version-check pillow
 
-      - name: Convert active heavy PNG images to WebP
+      - name: Convert active heavy images to WebP
         shell: bash
         run: |
           python - <<'PY'
@@ -52,13 +52,26 @@ jobs:
               dst = src.with_suffix('.webp')
               with Image.open(src) as im:
                   im.load()
-                  # Keep transparency when present; otherwise save RGB for smaller files.
                   if im.mode in ('RGBA', 'LA') or ('transparency' in im.info):
                       out = im.convert('RGBA')
                   else:
                       out = im.convert('RGB')
                   out.save(dst, 'WEBP', quality=82, method=6)
               converted.append((src, dst))
+
+          # Optimize the large transparent homepage logo separately.
+          logo_src = root / 'logo-transparent.png'
+          if logo_src.exists():
+              logo_dst = root / 'logo-transparent.webp'
+              with Image.open(logo_src) as im:
+                  im.load()
+                  out = im.convert('RGBA')
+                  max_width = 900
+                  if out.width > max_width:
+                      new_height = round(out.height * max_width / out.width)
+                      out = out.resize((max_width, new_height), Image.Resampling.LANCZOS)
+                  out.save(logo_dst, 'WEBP', quality=88, method=6)
+              converted.append((logo_src, logo_dst))
 
           # Update every site text file that could reference these image names.
           text_files = list(root.glob('*.html')) + list(root.glob('*.css')) + list(root.glob('*.js'))
@@ -70,18 +83,19 @@ jobs:
               if text != original:
                   p.write_text(text, encoding='utf-8')
 
-          # Remove PNG originals only after successful WebP creation and reference updates.
+          # Remove originals only after successful WebP creation and reference updates.
           for src, dst in converted:
               if dst.exists() and dst.stat().st_size > 0:
                   src.unlink()
 
-          print(f'Converted {len(converted)} active PNG images to WebP.')
+          print(f'Converted {len(converted)} active images to WebP.')
           PY
 
       - name: Show image-size savings
         shell: bash
         run: |
           du -sh assets || true
+          ls -lh logo-transparent.webp 2>/dev/null || true
           find assets -maxdepth 1 -type f -name '*.webp' -printf '%f %k KB\n' | sort
 
       - name: Commit optimized images and updated references
@@ -89,10 +103,10 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A assets *.html *.css *.js
+          git add -A assets *.html *.css *.js logo-transparent.png logo-transparent.webp 2>/dev/null || true
           if git diff --cached --quiet; then
             echo 'No optimization changes were needed.'
           else
-            git commit -m 'Optimize active gallery images to WebP'
+            git commit -m 'Optimize active images and homepage logo to WebP'
             git push origin HEAD:main
           fi
