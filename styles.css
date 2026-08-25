@@ -27,3 +27,8 @@
 
 /* Standardized desktop header branding across all pages. */
 @media(min-width:1051px){.top .brand-name,.home-theme .top .brand-name{font-size:58px!important}.top .brand-tag,.home-theme .top .brand-tag{font-size:11px!important}}
+
+/* Keep About Us immediately above Contact in every navigation layout. */
+.top .links a[href$="about.html"]{order:90}
+.top .links a[href$="contact.html"]{order:91}
+.top .links .book-pill{order:92}
