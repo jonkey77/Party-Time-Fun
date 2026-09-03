@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Party Time Fun | Private vs Commercial Layout Test</title>
+<meta name="description" content="Private and commercial event layout test for Party Time Fun.">
+<link rel="stylesheet" href="styles.css?v=20260824-8">
+<style>
+.audience-wrap{max-width:1180px;margin:0 auto;padding:54px 22px 70px}
+.audience-intro{text-align:center;max-width:860px;margin:0 auto 34px}
+.audience-intro h1{font-size:clamp(38px,5vw,62px);color:var(--purple);margin:0 0 12px}
+.audience-intro p{font-size:18px;line-height:1.65;margin:0;color:#5c3b6c}
+.audience-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:stretch}
+.audience-card{background:#fff;border-radius:28px;padding:32px;box-shadow:0 16px 42px rgba(65,22,91,.14);display:flex;flex-direction:column;min-height:520px}
+.audience-card.private{border-top:10px solid var(--pink)}
+.audience-card.commercial{border-top:10px solid var(--teal)}
+.audience-icon{font-size:44px;line-height:1;margin-bottom:16px}
+.audience-card h2{font-size:34px;margin:0 0 8px;color:var(--purple)}
+.audience-card .sub{font-size:17px;line-height:1.55;color:#654974;margin-bottom:20px}
+.pill-row{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 22px}
+.pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#f6eef9;color:#563667;font-weight:800;font-size:13px}
+.commercial .pill{background:#eefafa;color:#245d5f}
+.flow{margin:0 0 22px;padding:0;list-style:none}
+.flow li{padding:11px 0;border-bottom:1px solid #eee4f2;line-height:1.45}
+.flow li:last-child{border-bottom:0}
+.flow strong{display:block;color:#3f2450;margin-bottom:2px}
+.action-group{margin-top:auto}
+.action-group .btn{display:block;text-align:center;margin-top:10px}
+.private .btn-primary{background:var(--pink);color:#fff}
+.commercial .btn-primary{background:var(--teal);color:#fff}
+.note{margin-top:30px;padding:20px 22px;border-radius:18px;background:#fff8fd;border-left:6px solid var(--pink);line-height:1.6;color:#5e4368}
+@media(max-width:780px){.audience-grid{grid-template-columns:1fr}.audience-card{min-height:0;padding:24px}.audience-wrap{padding-top:34px}.audience-card h2{font-size:29px}}
+</style>
+<script src="./mobile-nav.js?v=20260821-2" defer></script>
+</head>
+<body>
+<header class="top"><nav class="nav"><a class="brandmark" href="index.html" aria-label="Party Time Fun home"><span class="brand-name"><span class="party">Party</span><span class="time">Time</span><span class="fun">Fun</span></span><span class="brand-tag">FACE PAINTING &amp; PARTY ENTERTAINMENT</span></a><div class="links"><a href="index.html">HOME</a><a href="services.html">SERVICES</a><a href="bundles.html">BUNDLES</a><a href="gallery.html">GALLERY</a><a href="about.html">ABOUT US</a><a href="government.html">GOV EVENTS</a><a href="ratings.html">RATINGS</a><a href="book.html">BOOK NOW</a><a href="contact.html">CONTACT</a><a class="book-pill" href="book.html">BOOK NOW</a></div></nav></header>
+<main class="audience-wrap">
+<section class="audience-intro">
+<div class="eyebrow" style="color:var(--pink)">Choose Your Event Type</div>
+<h1>What Are You Planning?</h1>
+<p>Start with the path that best matches your event. Private celebrations focus on easy-to-shop packages and add-ons. Commercial and community events focus on attendance, staffing, services and a tailored quote.</p>
+</section>
+<section class="audience-grid">
+<article class="audience-card private">
+<div class="audience-icon">🎉</div>
+<h2>Private Events</h2>
+<p class="sub">A simple, colorful path for birthdays, family celebrations and smaller private gatherings.</p>
+<div class="pill-row"><span class="pill">Birthdays</span><span class="pill">Family Parties</span><span class="pill">Celebrations</span><span class="pill">Small Events</span></div>
+<ul class="flow">
+<li><strong>1. Choose your entertainment</strong>Face painting, balloon twisting, glitter tattoos, airbrush tattoos and more.</li>
+<li><strong>2. Pick a package</strong>See simple package choices with starting prices.</li>
+<li><strong>3. Add extras</strong>Add time, an entertainer, glitter services, a centerpiece or another activity station.</li>
+<li><strong>4. Request your party</strong>Send your event details through the Book Now form.</li>
+</ul>
+<div class="action-group"><a class="btn btn-primary" href="bundles.html">VIEW PARTY PACKAGES</a><a class="btn btn-secondary" href="book.html">BOOK NOW</a></div>
+</article>
+<article class="audience-card commercial">
+<div class="audience-icon">🏢</div>
+<h2>Commercial &amp; Community Events</h2>
+<p class="sub">A planning-first path for larger audiences, organizations and events that may need multiple entertainers or service stations.</p>
+<div class="pill-row"><span class="pill">Corporate</span><span class="pill">Schools</span><span class="pill">Government</span><span class="pill">Festivals</span><span class="pill">Community</span></div>
+<ul class="flow">
+<li><strong>1. Tell us about the event</strong>Date, location, attendance and event type help determine the right setup.</li>
+<li><strong>2. Choose services</strong>Face painting, balloon twisting, glitter, airbrush and balloon centerpieces.</li>
+<li><strong>3. Plan staffing</strong>Party Time Fun recommends entertainers and service stations based on crowd size and duration.</li>
+<li><strong>4. Receive a tailored quote</strong>Pricing reflects staffing, service mix, event length, travel and event requirements.</li>
+</ul>
+<div class="action-group"><a class="btn btn-primary" href="government.html">VIEW COMMERCIAL SERVICES</a><a class="btn btn-secondary" href="book.html">REQUEST AN EVENT QUOTE</a></div>
+</article>
+</section>
+<div class="note"><strong>TEST PAGE ONLY:</strong> This layout is on a separate GitHub test branch and does not change the live Party Time Fun website.</div>
+</main>
+<footer><p><strong>Party Time Fun</strong> • Austin • Temple • Killeen • Waco • Surrounding Central Texas</p><p><a href="tel:+15123644730">(512) 364-4730</a> • <a href="mailto:contactpartytimefun@gmail.com">contactpartytimefun@gmail.com</a></p></footer>
+</body>
+</html>
